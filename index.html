@@ -1,16 +1,559 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Docker Assignment</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vedantpare0203 — Docker Assignment</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0c0f;
+      --surface:  #111418;
+      --border:   #1e2530;
+      --accent:   #00e5ff;
+      --accent2:  #7c3aed;
+      --green:    #22c55e;
+      --muted:    #4a5568;
+      --text:     #e2e8f0;
+      --dim:      #94a3b8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID NOISE BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GLOW ORBS ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .orb1 { width: 500px; height: 500px; background: rgba(124,58,237,0.12); top: -150px; right: -100px; }
+    .orb2 { width: 400px; height: 400px; background: rgba(0,229,255,0.08); bottom: 100px; left: -100px; animation-delay: -6s; }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, 40px) scale(1.05); }
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(10,12,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--dim);
+    }
+    .topbar-brand .whale { font-size: 1.4rem; }
+    .topbar-brand span { color: var(--accent); font-weight: 700; }
+
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--green);
+    }
+    .dot {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6rem 2rem 3rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.4s forwards;
+    }
+
+    .hero-title .line1 { display: block; color: var(--text); }
+    .hero-title .line2 {
+      display: block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 0.85rem;
+      color: var(--dim);
+      max-width: 560px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.6s forwards;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.8s forwards;
+    }
+    .badge {
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.72rem;
+      color: var(--dim);
+      letter-spacing: 0.05em;
+    }
+    .badge.accent { border-color: var(--accent); color: var(--accent); }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.6s 1s forwards;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border: 1px solid var(--accent);
+    }
+    .btn-primary:hover { background: transparent; color: var(--accent); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── TERMINAL CARD ── */
+    .terminal-section {
+      position: relative; z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+    }
+
+    .terminal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0,229,255,0.05);
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: #0d1117;
+      border-bottom: 1px solid var(--border);
+    }
+    .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .term-dot.r { background: #ff5f57; }
+    .term-dot.y { background: #febc2e; }
+    .term-dot.g { background: #28c840; }
+    .term-title { margin-left: 0.5rem; font-size: 0.75rem; color: var(--muted); }
+
+    .terminal-body { padding: 1.5rem; font-size: 0.82rem; line-height: 2; }
+    .t-line { display: flex; gap: 0.5rem; }
+    .t-prompt { color: var(--green); white-space: nowrap; }
+    .t-cmd { color: var(--text); }
+    .t-comment { color: var(--muted); }
+    .t-out { color: var(--dim); padding-left: 1.5rem; }
+    .t-accent { color: var(--accent); }
+    .t-green { color: var(--green); }
+    .t-purple { color: #a78bfa; }
+    .t-gap { height: 0.5rem; }
+
+    /* ── SECTIONS ── */
+    .section {
+      position: relative; z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── CARDS GRID ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .card-icon { font-size: 1.6rem; margin-bottom: 0.8rem; }
+    .card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.4rem; color: var(--text); }
+    .card-desc { font-size: 0.75rem; color: var(--dim); line-height: 1.6; }
+    .card-link { font-size: 0.72rem; color: var(--accent); margin-top: 1rem; display: inline-block; }
+
+    /* ── TOPICS ── */
+    .topics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .topic-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.2s;
+    }
+    .topic-item:hover { border-color: var(--accent2); }
+
+    .topic-num {
+      font-size: 0.7rem;
+      color: var(--accent2);
+      font-weight: 700;
+      min-width: 24px;
+      padding-top: 2px;
+    }
+    .topic-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .topic-sub { font-size: 0.72rem; color: var(--dim); margin-top: 0.2rem; }
+
+    /* ── TECH TAGS ── */
+    .tech-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .tech-tag {
+      padding: 0.4rem 0.9rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--dim);
+      transition: all 0.2s;
+    }
+    .tech-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .topbar { padding: 0.75rem 1rem; }
+      .hero { padding: 5rem 1rem 2rem; }
+      .terminal-section, .section { padding: 0 1rem 3rem; }
+      .topics { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <h1>Containerisation and DevOps Assignment</h1>
-    <p>By Vedant Pare</p>
 
-    <h2>Project Files</h2>
-    <ul>
-        <li><a href="Docker_Project_Report.pdf">View Report</a></li>
-        <li><a href="Screenshots_Assignment/">Screenshots Folder</a></li>
-    </ul>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- TOPBAR -->
+  <nav class="topbar">
+    <div class="topbar-brand">
+      <span class="whale">🐳</span>
+      <span>vedantpare0203</span> / Containerisation-and-devops-Assignment_1
+    </div>
+    <div class="topbar-status">
+      <div class="dot"></div>
+      github-pages · deployed
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-tag">// Containerisation &amp; DevOps · March 2026</p>
+    <h1 class="hero-title">
+      <span class="line1">Docker &amp; Compose</span>
+      <span class="line2">Assignment 1</span>
+    </h1>
+    <p class="hero-sub">
+      A full-stack containerized application using Docker Compose,
+      multi-stage builds, custom networking (IPvlan / Macvlan),
+      and PostgreSQL with volume persistence.
+    </p>
+    <div class="hero-badges">
+      <span class="badge accent">Docker Compose</span>
+      <span class="badge">Multi-Stage Build</span>
+      <span class="badge">PostgreSQL 15</span>
+      <span class="badge">Node.js + Express</span>
+      <span class="badge">Alpine Linux</span>
+    </div>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="https://github.com/vedantpare0203/Containerisation-and-devops-Assignment_1" target="_blank">
+        🐙 GitHub Repo
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/vedantpare0203/Containerisation-and-devops-Assignment_1/blob/main/Docker_Project_Report.pdf" target="_blank">
+        📄 PDF Report
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/vedantpare0203/Containerisation-and-devops-Assignment_1/tree/main/Screenshots_Assignment" target="_blank">
+        🖼 Screenshots
+      </a>
+    </div>
+  </section>
+
+  <!-- TERMINAL -->
+  <div class="terminal-section">
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="term-dot r"></span>
+        <span class="term-dot y"></span>
+        <span class="term-dot g"></span>
+        <span class="term-title">bash — ~/assignment</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">vedant@docker:~$</span><span class="t-cmd">&nbsp;git clone https://github.com/vedantpare0203/Containerisation-and-devops-Assignment_1</span></div>
+        <div class="t-out t-green">✔ Cloning into 'Containerisation-and-devops-Assignment_1'...</div>
+        <div class="t-gap"></div>
+        <div class="t-line"><span class="t-prompt">vedant@docker:~$</span><span class="t-cmd">&nbsp;cd Containerisation-and-devops-Assignment_1 &amp;&amp; ls</span></div>
+        <div class="t-out"><span class="t-accent">backend/</span>&nbsp;&nbsp;<span class="t-accent">database/</span>&nbsp;&nbsp;<span class="t-accent">Screenshots_Assignment/</span>&nbsp;&nbsp;<span class="t-purple">docker-compose.yml</span>&nbsp;&nbsp;<span class="t-purple">.dockerignore</span>&nbsp;&nbsp;index.html</div>
+        <div class="t-gap"></div>
+        <div class="t-line"><span class="t-prompt">vedant@docker:~$</span><span class="t-cmd">&nbsp;docker compose up --build</span></div>
+        <div class="t-out t-comment"># Building multi-stage images...</div>
+        <div class="t-out"><span class="t-green">✔</span> Container <span class="t-accent">backend</span> started &nbsp;<span class="t-comment">→ localhost:3000</span></div>
+        <div class="t-out"><span class="t-green">✔</span> Container <span class="t-accent">postgres</span> started &nbsp;<span class="t-comment">→ port 5432</span></div>
+        <div class="t-out t-green">✔ All services healthy. Image size: ~150 MB (was ~900 MB)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK ACCESS -->
+  <section class="section">
+    <p class="section-label">Quick Access</p>
+    <div class="cards">
+      <a class="card" href="https://github.com/vedantpare0203/Containerisation-and-devops-Assignment_1" target="_blank">
+        <div class="card-icon">🐙</div>
+        <div class="card-title">Source Code</div>
+        <div class="card-desc">Browse Dockerfiles, docker-compose.yml, backend, and database scripts on GitHub.</div>
+        <span class="card-link">Open Repo →</span>
+      </a>
+      <a class="card" href="https://github.com/vedantpare0203/Containerisation-and-devops-Assignment_1/blob/main/Docker_Project_Report.pdf" target="_blank">
+        <div class="card-icon">📄</div>
+        <div class="card-title">PDF Report</div>
+        <div class="card-desc">Full formatted report with architecture diagrams, screenshots, and analysis.</div>
+        <span class="card-link">Open PDF →</span>
+      </a>
+      <a class="card" href="https://github.com/vedantpare0203/Containerisation-and-devops-Assignment_1/tree/main/Screenshots_Assignment" target="_blank">
+        <div class="card-icon">🖼</div>
+        <div class="card-title">Screenshots</div>
+        <div class="card-desc">Container IPs, network inspect, volume persistence — visual proof of all tasks.</div>
+        <span class="card-link">View Screenshots →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- REPORT SECTIONS -->
+  <section class="section">
+    <p class="section-label">What's Inside the Report</p>
+    <div class="topics">
+      <div class="topic-item">
+        <span class="topic-num">01</span>
+        <div>
+          <div class="topic-name">Introduction</div>
+          <div class="topic-sub">Project goals and two-service architecture overview</div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <span class="topic-num">02</span>
+        <div>
+          <div class="topic-name">System Architecture</div>
+          <div class="topic-sub">Backend + PostgreSQL design with Docker Compose</div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <span class="topic-num">03</span>
+        <div>
+          <div class="topic-name">Multi-Stage Build</div>
+          <div class="topic-sub">Reducing image size from ~900 MB to ~150 MB</div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <span class="topic-num">04</span>
+        <div>
+          <div class="topic-name">Network Design</div>
+          <div class="topic-sub">Bridge, IPvlan, and Macvlan — setup and comparison</div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <span class="topic-num">05</span>
+        <div>
+          <div class="topic-name">Image Size Comparison</div>
+          <div class="topic-sub">Before/after metrics for multi-stage optimization</div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <span class="topic-num">06</span>
+        <div>
+          <div class="topic-name">Macvlan vs IPvlan</div>
+          <div class="topic-sub">Side-by-side feature and use-case analysis</div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <span class="topic-num">07</span>
+        <div>
+          <div class="topic-name">Volume Persistence</div>
+          <div class="topic-sub">Data surviving container restarts with named volumes</div>
+        </div>
+      </div>
+      <div class="topic-item">
+        <span class="topic-num">08</span>
+        <div>
+          <div class="topic-name">Conclusion</div>
+          <div class="topic-sub">Key outcomes and learnings from the project</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="section">
+    <p class="section-label">Technologies Used</p>
+    <div class="tech-grid">
+      <span class="tech-tag">🐳 Docker</span>
+      <span class="tech-tag">🔧 Docker Compose</span>
+      <span class="tech-tag">🗄 PostgreSQL 15</span>
+      <span class="tech-tag">⚡ Node.js 18</span>
+      <span class="tech-tag">🚀 Express.js</span>
+      <span class="tech-tag">🏗 Multi-Stage Build</span>
+      <span class="tech-tag">🌐 IPvlan</span>
+      <span class="tech-tag">🔗 Macvlan</span>
+      <span class="tech-tag">💾 Volume Persistence</span>
+      <span class="tech-tag">🔄 REST API</span>
+      <span class="tech-tag">🐧 Alpine Linux</span>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    Made by <a href="https://github.com/vedantpare0203" target="_blank">vedantpare0203</a> &nbsp;·&nbsp;
+    Containerisation &amp; DevOps Assignment 1 &nbsp;·&nbsp; March 2026
+  </footer>
+
 </body>
 </html>
