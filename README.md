@@ -1,4 +1,4 @@
-# 🚀 Containerized Web Application with Docker
+# Containerized Web Application with Docker
 
 A production-ready containerized web application demonstrating the use of **Docker and Docker Compose** to run a frontend, backend, and database in isolated environments with proper networking and volume management.
 
@@ -18,16 +18,16 @@ Containerisation-and-devops-Assignment_1/
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
-### 🔧 Prerequisites
+### Prerequisites
 - Docker installed  
 - Docker Compose installed  
 - Git installed  
 
 ---
 
-### 1️⃣ Clone the Repository
+### 1️Clone the Repository
 git clone https://github.com/vedantpare0203/Containerisation-and-devops-Assignment_1.git  
 cd Containerisation-and-devops-Assignment_1  
 
@@ -49,8 +49,7 @@ http://localhost:3000
 
 ---
 
-## 📡 API Endpoints
-
+## API Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET    | /        | Home route |
@@ -60,7 +59,7 @@ http://localhost:3000
 
 ---
 
-## 🧪 Testing Commands
+## Testing Commands
 
 ### Check running containers
 docker ps  
@@ -91,7 +90,7 @@ curl http://localhost:3000/data
 
 ---
 
-## 🌐 Network
+## Network
 
 Docker Compose automatically creates a network allowing communication between containers.
 
@@ -100,7 +99,7 @@ docker network inspect containerisation-and-devops-assignment_1_default
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ![Output](Screenshots_Assignment/your-image.png)
 
